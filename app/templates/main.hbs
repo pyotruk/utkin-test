@@ -1,0 +1,37 @@
+<div id="card">
+    {{#with selected}}
+        <div class="sidebar">
+            <ul>
+                <li>{{first_name}}</li>
+                <li>{{last_name}}</li>
+                <li>{{age}}</li>
+                <li>{{location}}</li>
+            </ul>
+        </div>
+        <div class="center">
+            <h1>{{first_name}}</h1>
+            <h1>{{last_name}}</h1>
+        </div>
+    {{/with}}
+</div>
+
+<div id="list">
+    <ul class="reel">
+        {{#each persons}}
+            <li>
+                <a href="#{{id}}" class="{{addActiveClass}}" data-id="{{id}}">
+                    <div class="inner">
+                        <p>{{first_name}}</p>
+                        <p>{{age}}</p>
+                    </div>
+                </a>
+            </li>
+        {{/each}}
+    </ul>
+</div>
+
+<div id="controls">
+    <a href="#" class="prev">&larr;</a>
+    <span>2</span>
+    <a href="#" class="next">&rarr;</a>
+</div>

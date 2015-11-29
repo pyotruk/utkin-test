@@ -1,0 +1,116 @@
+html, body {
+  height: 100%;
+}
+ul {
+  padding: 0;
+  margin: 0;
+  list-style-type: none;
+}
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+@colorGray: #DDD;
+@colorDarkGray: #777;
+
+@fontSize: 1em;
+@fontFamily: Helvetica;
+@width: 900px;
+
+@listItemsPerPage: 6;
+@listHeight: 190px;
+@listItemBorder: 1px solid @colorGray - #222;
+@listItemBorderHover: 3px solid @colorGray;
+@listItemWidth: @width / @listItemsPerPage;
+
+@cardHeight: 60%;
+@sidebarWidth: @listItemWidth;
+@centerWidth: @listItemWidth * 5;
+
+
+body {
+  font: @fontSize @fontFamily;
+  text-align: center;
+  width: @width;
+  margin: auto;
+
+  #layout {
+    height: 100%;
+
+    #card {
+      height: @cardHeight;
+      overflow: hidden;
+
+      .sidebar, .center {
+        height: 100%;
+      }
+
+      .sidebar {
+        width: @sidebarWidth;
+        float: left;
+        margin-right: 0;
+        background-color: @colorDarkGray;
+
+        ul {
+          text-align: left;
+          padding: 1em;
+          margin-top: 3em;
+          li {
+            margin-bottom: 1.5em;
+            color: white;
+          }
+        }
+      }
+      .center {
+        width: @centerWidth;
+        margin-left: @sidebarWidth;
+        background-color: @colorGray;
+        padding: 1em;
+      }
+    }
+
+    #list {
+      position: relative;
+      overflow: hidden;
+      height: @listHeight;
+      margin-top: 2em;
+
+      .reel {
+        position: absolute;
+        left: 0;
+        width: @width * 10;
+        overflow: hidden;
+
+        li {
+          float: left;
+          width: @listItemWidth;
+          text-align: center;
+          cursor: pointer;
+
+          a {
+            border-left: @listItemBorder;
+            display: block;
+
+            .inner {
+              padding: 1em;
+              background-color: @colorGray;
+              border: @listItemBorderHover;
+            }
+          }
+        }
+        li:first-child a {
+          border-left: none;
+        }
+        li:hover a .inner, a.act .inner {
+          border-color: @colorDarkGray;
+        }
+      }
+    }
+
+    #controls {
+      margin: 1em;
+    }
+  }
+
+}
