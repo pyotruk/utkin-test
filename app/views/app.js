@@ -1,6 +1,22 @@
 var AppView = Backbone.View.extend({
     el: '#layout',
 
+    ui: {
+        list: {
+            items: '#list a',
+            findById: function (id) {
+                return $(this.items).filter('[data-id=' + id + ']');
+            },
+            extractId: function(el){
+                return $(el).attr('data-id');
+            }
+        },
+        controls: {
+            prev: "#controls .prev",
+            next: "#controls .next"
+        }
+    },
+
     template: Handlebars.templates['main.hbs'],
 
     model: {
@@ -8,10 +24,12 @@ var AppView = Backbone.View.extend({
         selected: null
     },
 
-    events: {
-        "click #list a": "onSelect",
-        "click #controls .prev": "prev",
-        "click #controls .next": "next",
+    events: function(){
+        var events = {};
+        events["click " + this.ui.list.items] = "onSelect";
+        events["click " + this.ui.controls.prev] = "prev";
+        events["click " + this.ui.controls.next] = "next";
+        return events;
     },
 
     initialize: function () {
@@ -21,7 +39,7 @@ var AppView = Backbone.View.extend({
     onSelect: function (e) {
         var self = this;
 
-        self.setSelected($(e.currentTarget).attr('data-id'));
+        self.setSelected(self.ui.list.extractId(e.currentTarget));
         self.render();
 
         return false;
@@ -32,11 +50,10 @@ var AppView = Backbone.View.extend({
 
         self.model.selected = self.model.persons.get({id: id});
         self.model.selected.set({
-            index: self.model.persons.indexOf(self.model.selected) + 1
+            index: self.getSelectedIndex() + 1
         });
 
-        //TODO too dirty
-        var target = self.$el.find('a[data-id=' + target + ']');
+        var target = self.ui.list.findById(id);
 
         target.parent().siblings().find('a').removeClass('act');
         target.addClass('act');
@@ -44,23 +61,32 @@ var AppView = Backbone.View.extend({
     },
 
     getSelected: function () {
-        return this.$el.find('a.act');
+        var self = this;
+        return self.model.persons.get({id: self.model.selected.id});
+    },
+    getSelectedIndex: function () {
+        var self = this;
+        return self.model.persons.indexOf(self.model.selected);
     },
     getNext: function () {
-        return this.getSelected().parent().next().find('a').attr('data-id');
+        var self = this;
+        var next = self.getSelectedIndex() + 1;
+        if (next >= $(self.ui.list.items).length) next = 0;
+        return self.model.persons.models[next].id;
     },
     getPrev: function () {
-        return this.getSelected().parent().prev().find('a').attr('data-id');
+        var self = this;
+        var prev = self.getSelectedIndex() - 1;
+        if (prev < 0) prev = $(self.ui.list.items).length - 1;
+        return self.model.persons.models[prev].id;
     },
 
     prev: function () {
-        // TODO round to last item
         this.setSelected(this.getPrev());
         this.render();
         return false;
     },
     next: function () {
-        // TODO round to first item
         this.setSelected(this.getNext());
         this.render();
         return false;
