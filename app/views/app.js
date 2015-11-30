@@ -1,13 +1,20 @@
 var AppView = Backbone.View.extend({
-    el: '#layout',
 
+    options: null,
+    template: null,
+    model: {
+        persons: null,
+        selected: null
+    },
+
+    el: '#layout',
     ui: {
         list: {
             items: '#list a',
             findById: function (id) {
                 return $(this.items).filter('[data-id=' + id + ']');
             },
-            extractId: function(el){
+            extractId: function (el) {
                 return $(el).attr('data-id');
             }
         },
@@ -17,14 +24,7 @@ var AppView = Backbone.View.extend({
         }
     },
 
-    template: Handlebars.templates['main.hbs'],
-
-    model: {
-        persons: null,
-        selected: null
-    },
-
-    events: function(){
+    events: function () {
         var events = {};
         events["click " + this.ui.list.items] = "onSelect";
         events["click " + this.ui.controls.prev] = "prev";
@@ -32,8 +32,30 @@ var AppView = Backbone.View.extend({
         return events;
     },
 
-    initialize: function () {
+    initialize: function (options) {
+        this.options = options;
+
+        this.buildTemplate();
+        this.buildModel();
+
         this.load();
+    },
+
+    buildTemplate: function () {
+        this.template = Handlebars.templates[this.options.template];
+    },
+
+    buildModel: function () {
+        var self = this;
+        var Person = Backbone.Model.extend();
+        var Persons = Backbone.Collection.extend({
+            model: Person,
+            url: self.options.data,
+            parse: function (response) {
+                return response;
+            },
+        });
+        self.model.persons = new Persons;
     },
 
     onSelect: function (e) {
@@ -55,8 +77,8 @@ var AppView = Backbone.View.extend({
 
         var target = self.ui.list.findById(id);
 
-        target.parent().siblings().find('a').removeClass('act');
-        target.addClass('act');
+        target.parent().siblings().find('a').removeClass(self.options.listItemActiveClass);
+        target.addClass(self.options.listItemActiveClass);
 
     },
 
@@ -94,18 +116,6 @@ var AppView = Backbone.View.extend({
 
     load: function () {
         var self = this;
-
-        var Person = Backbone.Model.extend();
-
-        var Persons = Backbone.Collection.extend({
-            model: Person,
-            url: 'data.json',
-            parse: function (response) {
-                return response;
-            },
-        });
-
-        self.model.persons = new Persons;
         self.model.persons.fetch({
             success: function (collection, response) {
                 self.model.persons = collection;
@@ -124,4 +134,8 @@ var AppView = Backbone.View.extend({
     }
 });
 
-var appView = new AppView();
+var appView = new AppView({
+    listItemActiveClass: 'act',
+    template: 'main.hbs',
+    data: 'data.json'
+});
