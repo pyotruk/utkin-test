@@ -1,0 +1,9 @@
+{
+  "name": "utkin-test",
+  "version": "0.1.0",
+  "devDependencies": {
+    "grunt": "^0.4.5",
+    "grunt-contrib-handlebars": "^0.11.0",
+    "grunt-contrib-less": "^1.1.0"
+  }
+}

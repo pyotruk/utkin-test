@@ -1,4 +1,4 @@
-var AppView = Backbone.View.extend({
+var MainView = Backbone.View.extend({
 
     options: null,
     template: null,
@@ -43,7 +43,7 @@ var AppView = Backbone.View.extend({
     },
 
     buildTemplate: function () {
-        this.template = Handlebars.templates[this.options.template];
+        this.template = CHSH.Templates[this.options.template];
     },
 
     buildModel: function () {
@@ -142,9 +142,9 @@ var AppView = Backbone.View.extend({
     }
 });
 
-var appView = new AppView({
+var mainView = new MainView({
     listItemActiveClass: 'act',
-    template: 'main.hbs',
+    template: 'app/templates/main.hbs',
     data: 'data.json',
     defaultItemIndex: 2,
 });
