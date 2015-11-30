@@ -38,7 +38,8 @@ var AppView = Backbone.View.extend({
         this.buildTemplate();
         this.buildModel();
 
-        this.load();
+        var selectedItemIndex = location.hash ? location.hash.replace(/\D/, '') : this.options.defaultItemIndex;
+        this.load(selectedItemIndex);
     },
 
     buildTemplate: function () {
@@ -72,7 +73,7 @@ var AppView = Backbone.View.extend({
 
         self.model.selected = self.model.persons.get({id: id});
         self.model.selected.set({
-            index: self.getSelectedIndex() + 1
+            index: self.getSelectedIndex()
         });
 
         var target = self.ui.list.findById(id);
@@ -80,6 +81,7 @@ var AppView = Backbone.View.extend({
         target.parent().siblings().find('a').removeClass(self.options.listItemActiveClass);
         target.addClass(self.options.listItemActiveClass);
 
+        location.hash = '#' + self.getSelectedIndex();
     },
 
     getSelected: function () {
@@ -88,19 +90,19 @@ var AppView = Backbone.View.extend({
     },
     getSelectedIndex: function () {
         var self = this;
-        return self.model.persons.indexOf(self.model.selected);
+        return self.model.persons.indexOf(self.model.selected) + 1;
     },
     getNext: function () {
         var self = this;
         var next = self.getSelectedIndex() + 1;
-        if (next >= $(self.ui.list.items).length) next = 0;
-        return self.model.persons.models[next].id;
+        if (next > $(self.ui.list.items).length) next = 1;
+        return self.model.persons.models[next - 1].id;
     },
     getPrev: function () {
         var self = this;
         var prev = self.getSelectedIndex() - 1;
-        if (prev < 0) prev = $(self.ui.list.items).length - 1;
-        return self.model.persons.models[prev].id;
+        if (prev < 1) prev = $(self.ui.list.items).length;
+        return self.model.persons.models[prev - 1].id;
     },
 
     prev: function () {
@@ -114,12 +116,18 @@ var AppView = Backbone.View.extend({
         return false;
     },
 
-    load: function () {
+    load: function (selectedItemIndex) {
         var self = this;
         self.model.persons.fetch({
             success: function (collection, response) {
                 self.model.persons = collection;
-                self.setSelected(collection.get({id: 2}).id);
+
+                var selected = collection.models[selectedItemIndex - 1];
+                if (!selected) {
+                    selected = collection.models[self.options.defaultItemIndex - 1];
+                }
+
+                self.setSelected(selected.id);
                 self.render();
             }
         });
@@ -137,5 +145,6 @@ var AppView = Backbone.View.extend({
 var appView = new AppView({
     listItemActiveClass: 'act',
     template: 'main.hbs',
-    data: 'data.json'
+    data: 'data.json',
+    defaultItemIndex: 2,
 });
